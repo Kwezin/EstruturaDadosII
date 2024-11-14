@@ -1,0 +1,299 @@
+//
+// Árvore AVL (Rotações) - Exemplo de implementação em Java
+// Copyright (C) 2024 André Kishimoto
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+//dia_semana	br	km	causa_acidente	tipo_acidente	classificacao_acidente	fase_dia	condicao_metereologica	tipo_veiculo	estado_fisico	idade	sexo
+
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+
+
+public class Node {
+    
+  private int id;
+  private String dia_semana;
+  private int br;
+  private float km;
+  private String causa_acidente;
+  private String tipo_acidente;
+  private String classificacao_acidente;
+  private String fase_dia;
+  private String condicao_metereologica;
+  private String tipo_veiculo;
+  private String estado_fisico;
+  private int idade;
+  private String sexo;
+  private int balanceFactor;
+  
+  protected Node left;
+  protected Node right;
+  protected Node parent;
+
+  
+
+      // Construtor da classe
+    public Node(int id, String dia_semana, int br, float km, String causa_acidente, String tipo_acidente, 
+                String classificacao_acidente, String fase_dia, String condicao_metereologica, 
+                String tipo_veiculo, String estado_fisico, int idade, String sexo, 
+                int balanceFactor, Node parent) {
+        this.id = id;
+        this.dia_semana = dia_semana;
+        this.br = br;
+        this.km = km;
+        this.causa_acidente = causa_acidente;
+        this.tipo_acidente = tipo_acidente;
+        this.classificacao_acidente = classificacao_acidente;
+        this.fase_dia = fase_dia;
+        this.condicao_metereologica = condicao_metereologica;
+        this.tipo_veiculo = tipo_veiculo;
+        this.estado_fisico = estado_fisico;
+        this.idade = idade;
+        this.sexo = sexo;
+        this.balanceFactor = balanceFactor;
+        this.parent = parent;
+        this.left = null;
+        this.right = null;
+    }
+
+    // Métodos getter e setter
+
+    public String getDia_semana() {
+        return dia_semana;
+    }
+
+    public void setDia_semana(String dia_semana) {
+        this.dia_semana = dia_semana;
+    }
+
+    public int getBr() {
+        return br;
+    }
+
+    public void setBr(int br) {
+        this.br = br;
+    }
+
+    public float getKm() {
+        return km;
+    }
+
+    public void setKm(float km) {
+        this.km = km;
+    }
+
+    public String getCausa_acidente() {
+        return causa_acidente;
+    }
+
+    public void setCausa_acidente(String causa_acidente) {
+        this.causa_acidente = causa_acidente;
+    }
+
+    public String getTipo_acidente() {
+        return tipo_acidente;
+    }
+
+    public void setTipo_acidente(String tipo_acidente) {
+        this.tipo_acidente = tipo_acidente;
+    }
+
+    public String getClassificacao_acidente() {
+        return classificacao_acidente;
+    }
+
+    public void setClassificacao_acidente(String classificacao_acidente) {
+        this.classificacao_acidente = classificacao_acidente;
+    }
+
+    public String getFase_dia() {
+        return fase_dia;
+    }
+
+    public void setFase_dia(String fase_dia) {
+        this.fase_dia = fase_dia;
+    }
+
+    public String getCondicao_metereologica() {
+        return condicao_metereologica;
+    }
+
+    public void setCondicao_metereologica(String condicao_metereologica) {
+        this.condicao_metereologica = condicao_metereologica;
+    }
+
+    public String getTipo_veiculo() {
+        return tipo_veiculo;
+    }
+
+    public void setTipo_veiculo(String tipo_veiculo) {
+        this.tipo_veiculo = tipo_veiculo;
+    }
+
+    public String getEstado_fisico() {
+        return estado_fisico;
+    }
+
+    public void setEstado_fisico(String estado_fisico) {
+        this.estado_fisico = estado_fisico;
+    }
+
+    public int getIdade() {
+        return idade;
+    }
+
+    public void setIdade(int idade) {
+        this.idade = idade;
+    }
+
+    public String getSexo() {
+        return sexo;
+    }
+
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getBalanceFactor() {
+        return balanceFactor;
+    }
+
+    public void setBalanceFactor(int balanceFactor) {
+        this.balanceFactor = balanceFactor;
+    }
+
+    public Node getParent() {
+        return parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
+
+    public Node getLeft() {
+        return left;
+    }
+    
+    public void setLeft(Node left) {
+        this.left = left;
+    
+        if (this.left != null) {
+          this.left.setParent(this);
+        }
+    
+        updateBalanceFactor();
+    }
+    
+    public Node getRight() {
+        return right;
+    }
+    
+    public void setRight(Node right) {
+        this.right = right;
+    
+        if (this.right != null) {
+          this.right.setParent(this);
+        }
+    
+        updateBalanceFactor();
+    }
+    
+    public boolean hasLeftChild() {
+        return left != null;
+    }
+    
+    public boolean hasRightChild() {
+        return right != null;
+    }
+    
+    public boolean isRoot() {
+        return parent == null;
+    }
+    
+    public boolean isLeaf() {
+        return left == null && right == null;
+    }
+    
+    public int getDegree() {
+        int degree = 0;
+    
+        if (hasLeftChild()) {
+          ++degree;
+        }
+    
+        if (hasRightChild()) {
+          ++degree;
+        }
+    
+        return degree;
+    }
+    
+    public int getLevel() {
+        if (isRoot()) {
+          return 0;
+        }
+    
+        return parent.getLevel() + 1;
+    }
+    
+    public int getHeight() {
+        if (isLeaf()) {
+          return 0;
+        }
+    
+        int height = 0;
+    
+        if (hasLeftChild()) {
+          height = Math.max(height, left.getHeight());
+        }
+    
+        if (hasRightChild()) {
+          height = Math.max(height, right.getHeight());
+        }
+    
+        return height + 1;
+    }
+    
+    
+    public void updateBalanceFactor() {
+        int leftHeight = hasLeftChild() ? left.getHeight() : -1;
+        int rightHeight = hasRightChild() ? right.getHeight() : -1;
+        balanceFactor = rightHeight - leftHeight;
+    }
+/*
+  @Override
+  public String toString() {
+    return "data: " + data
+        + ", parent: " + (parent != null ? parent.getData() : "null")
+        + ", left: " + (left != null ? left.getData() : "null")
+        + ", right: " + (right != null ? right.getData() : "null")
+        + ", isRoot(): " + isRoot()
+        + ", isLeaf(): " + isLeaf()
+        + ", getDegree(): " + getDegree()
+        + ", getLevel(): " + getLevel()
+        + ", getHeight(): " + getHeight()
+        + ", getBalanceFactor(): " + getBalanceFactor();
+  }
+*/
+}
+
