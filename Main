@@ -1,0 +1,69 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class Main {
+    public static void main(String[] args) {
+
+        BST arvoreBST = new BST();
+        AVL arvoreAVL = new AVL();
+        
+        String arquivoCSV = "src/main/java/arquivo.csv";
+        BufferedReader br = null;
+        String linha = "";
+        String csvDivisor = "\n";
+        try {
+
+            br = new BufferedReader(new FileReader(arquivoCSV));
+            while ((linha = br.readLine()) != null) {
+
+                String[] dados = linha.split(csvDivisor);
+
+                String[] separador = dados[0].split("\t");
+
+                separador[3] = separador[3].replaceAll(",", ".");
+                int id = Integer.parseInt(separador[0]);
+                String dia_semana = separador[1];
+                int br_estrada = Integer.parseInt(separador[2]);
+                float km = Float.parseFloat(separador[3]);
+                String causa_acidente = separador[4];
+                String tipo_acidente = separador[5];
+                String classificacao_acidente = separador[6];
+                String fase_dia = separador[7];
+                String condicao_metereologica = separador[8];
+                String tipo_veiculo = separador[9];
+                String estado_fisico = separador[10];
+                int idade = Integer.parseInt(separador[11]);
+                String sexo = separador[12];
+
+                Node no = new Node(id, dia_semana, br_estrada, km, causa_acidente, tipo_acidente, classificacao_acidente, fase_dia, condicao_metereologica, tipo_veiculo, estado_fisico, idade, sexo, 0, null);
+                
+         
+                arvoreBST.insert(no);
+                arvoreAVL.insert(no);
+
+
+                Node busca = arvoreAVL.search(1);
+                
+
+
+                
+
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+  }
+}
