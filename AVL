@@ -1,146 +1,169 @@
 public class AVL extends BST {
 
-  public AVL() {
-    super();
-  }
-
-  public AVL(Node root) {
-    super(root);
-  }
-
-  // Atualiza as conexões pai-filho ao realizar uma rotação
-  private void updateParentChild(Node parent, final Node child, Node newChild) {
-    if (parent != null) {
-      if (parent.getLeft() == child) {
-        parent.setLeft(newChild);
-      } else {
-        parent.setRight(newChild);
-      }
-    } else {
-      root = newChild;
-      newChild.setParent(null);
+    private int comparisonCountAVL;
+    public AVL() {
+        super();
+        comparisonCountAVL = 0;
     }
-  }
 
-  // Função para ajustar o balanceamento após uma inserção
-  private void rebalance(Node node) {
-    while (node != null) {
-      node.updateBalanceFactor();
+    public AVL(Node root) {
+        super(root);
+        comparisonCountAVL = 0;
+    }
 
-      int balanceFactor = node.getBalanceFactor();
+    public int getComparisonCountAVL() {
+        return comparisonCountAVL;
+    }
 
-      if (balanceFactor > 1) {
-        if (node.getRight().getBalanceFactor() < 0) {
-          node.setRight(rotateRight(node.getRight()));
+    public void resetComparisonCountAVL() {
+        comparisonCountAVL = 0;
+    }
+
+    private void updateParentChild(Node parent, Node child, Node newChild) {
+        if (parent != null) {
+            if (parent.getLeft() == child) {
+                parent.setLeft(newChild);
+            } else {
+                parent.setRight(newChild);
+            }
+        } else {
+            root = newChild;
+            if (newChild != null) {
+                newChild.setParent(null);
+            }
         }
-        node = rotateLeft(node);
-      } else if (balanceFactor < -1) {
-        if (node.getLeft().getBalanceFactor() > 0) {
-          node.setLeft(rotateLeft(node.getLeft()));
+    }
+
+    private Node rebalance(Node node) {
+        node.updateBalanceFactor();
+
+        if (node.getBalanceFactor() > 1) {
+            if (node.getRight() != null && node.getRight().getBalanceFactor() < 0) {
+                node.setRight(rotateRight(node.getRight()));
+            }
+            return rotateLeft(node);
+        } else if (node.getBalanceFactor() < -1) {
+            if (node.getLeft() != null && node.getLeft().getBalanceFactor() > 0) {
+                node.setLeft(rotateLeft(node.getLeft()));
+            }
+            return rotateRight(node);
         }
-        node = rotateRight(node);
-      }
-      node = node.getParent();
-    }
-  }
 
-  private Node rotateLeft(Node node) {
-    if (node == null) return null;
-
-    Node newRoot = node.getRight();
-    if (newRoot == null) return null;
-
-    Node parent = node.getParent();
-    updateParentChild(parent, node, newRoot);
-
-    Node left = newRoot.getLeft();
-    node.setRight(left);
-
-    newRoot.setLeft(node);
-    node.updateBalanceFactor();
-    newRoot.updateBalanceFactor();
-
-    return newRoot;
-  }
-
-  private Node rotateRight(Node node) {
-    if (node == null) return null;
-
-    Node newRoot = node.getLeft();
-    if (newRoot == null) return null;
-
-    Node parent = node.getParent();
-    updateParentChild(parent, node, newRoot);
-
-    Node right = newRoot.getRight();
-    node.setLeft(right);
-
-    newRoot.setRight(node);
-    node.updateBalanceFactor();
-    newRoot.updateBalanceFactor();
-
-    return newRoot;
-  }
-
-  // Método insert atualizado, recebendo um Node pronto como argumento
-  @Override
-  public void insert(Node newNode) {
-    root = insert(root, null, newNode);
-  }
-
-  // Método recursivo para inserção e balanceamento
-  @Override
-  protected Node insert(Node node, Node parent, Node newNode) {
-    if (node == null) {
-      newNode.setParent(parent);
-      rebalance(newNode);
-      return newNode;
+        return node;
     }
 
-    int diff = newNode.getId() - node.getId();
-    System.out.print("\n");
-    System.out.print(diff);
 
-    if (diff < 0) {
-      node.setLeft(insert(node.getLeft(), node, newNode));
-    } else if (diff > 0) {
-      node.setRight(insert(node.getRight(), node, newNode));
-    } else {
-      throw new RuntimeException("Duplicatas não são permitidas.");
+    private Node rotateLeft(Node node) {
+        if (node == null) return null;
+
+        Node newRoot = node.getRight();
+        updateParentChild(node.getParent(), node, newRoot);
+
+        node.setRight(newRoot.getLeft());
+        newRoot.setLeft(node);
+
+        node.updateBalanceFactor();
+        newRoot.updateBalanceFactor();
+
+        return newRoot;
     }
 
-    node.updateBalanceFactor();
-    rebalance(node);
+    private Node rotateRight(Node node) {
+        if (node == null) return null;
 
-    return node;
-  }
+        Node newRoot = node.getLeft();
+        updateParentChild(node.getParent(), node, newRoot);
 
+        node.setLeft(newRoot.getRight());
+        newRoot.setRight(node);
+
+        node.updateBalanceFactor();
+        newRoot.updateBalanceFactor();
+
+        return newRoot;
+    }
+
+    public void insertAVL(Node newNode) {
+        resetComparisonCountAVL();
+        root = insertAVL(root, null, newNode);
+    }
+
+    private Node insertAVL(Node node, Node parent, Node newNode) {
+        if (node == null) {
+            newNode.setParent(parent);
+            return newNode;
+        }
+
+        comparisonCountAVL++;
+
+        int diff = newNode.getId() - node.getId();
+
+        if (diff < 0) {
+            node.setLeft(insertAVL(node.getLeft(), node, newNode));
+        } else if (diff > 0) {
+            node.setRight(insertAVL(node.getRight(), node, newNode));
+        } else {
+            throw new RuntimeException("Duplicatas não permitidas!");
+        }
+
+        node.updateBalanceFactor();
+        return rebalance(node);
+
+
+    }
   @Override
   public void remove(int id) {
-    root = remove(root, id);
+      resetComparisonCountBST();
+      root = remove(root, id);
+      if (root != null) {
+          System.out.println("Removido com sucesso!");
+      }else{
+          System.out.println("Não foi possível remover!");
+      }
   }
 
-  @Override
-  protected Node remove(Node node, int id) {
-    if (node == null) {
-      throw new RuntimeException("Nó com ID " + id + " não existe na AVL!");
-    }
+  private Node remove(Node node, int id) {
+      if (node == null) return null;
 
-    int diff = id - node.getId();
+      setComaparisonCountBST(getComparisonCountBST()+1);
+      int diff = id - node.getId();
 
-    if (diff < 0) {
-      node.setLeft(remove(node.getLeft(), id));
-    } else if (diff > 0) {
-      node.setRight(remove(node.getRight(), id));
-    } else {
-      node = remove(node, id);
-    }
+      if (diff < 0) {
+          // Buscar na subárvore esquerda
+          node.setLeft(remove(node.getLeft(), id));
+      } else if (diff > 0) {
+          // Buscar na subárvore direita
+          node.setRight(remove(node.getRight(), id));
+      } else {
+          // Nó encontrado
+          if (node.getLeft() == null && node.getRight() == null) {
+              // Caso 1: Nó sem filhos
+              return null;
+          } else if (node.getLeft() == null) {
+              // Caso 2: Um único filho (direito)
+              return node.getRight();
+          } else if (node.getRight() == null) {
+              // Caso 2: Um único filho (esquerdo)
+              return node.getLeft();
+          } else {
+              // Caso 3: Dois filhos
+              Node successor = findMin(node.getRight());
+              node.setId(successor.getId());
+              node.setRight(remove(node.getRight(), successor.getId()));
+          }
+      }
 
-    if (node != null) {
+      // Atualizar o fator de balanceamento e rebalancear se necessário
       node.updateBalanceFactor();
-      rebalance(node);
-    }
-
-    return node;
+      return rebalance(node);
   }
+
+  private Node findMin(Node node) {
+      while (node.getLeft() != null) {
+          setComaparisonCountBST(getComparisonCountBST()+1);
+          node = node.getLeft();
+      }
+      return node;
+  }
+
 }
