@@ -1,7 +1,16 @@
+/*
+Kauê Henrique Matias Alves - 10417894
+Leonardo Moreira dos Santos - 10417555
+Matheus Alonso Varjão - 10417888
+Matheus Chediac Rodrigues - 10417490
+*/
+
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,14 +22,17 @@ public class Main {
         BufferedReader br = null;
         String linha = "";
         String csvDivisor = "\n";
+        int countInsertAVL = 0;
+        int countInsertBST = 0;
         try {
-
+            
             br = new BufferedReader(new FileReader(arquivoCSV));
             while ((linha = br.readLine()) != null) {
 
                 String[] dados = linha.split(csvDivisor);
 
                 String[] separador = dados[0].split("\t");
+                
 
                 separador[3] = separador[3].replaceAll(",", ".");
                 int id = Integer.parseInt(separador[0]);
@@ -37,18 +49,15 @@ public class Main {
                 int idade = Integer.parseInt(separador[11]);
                 String sexo = separador[12];
 
-                Node no = new Node(id, dia_semana, br_estrada, km, causa_acidente, tipo_acidente, classificacao_acidente, fase_dia, condicao_metereologica, tipo_veiculo, estado_fisico, idade, sexo, 0, null);
-                
+                Node noBST = new Node(id, dia_semana, br_estrada, km, causa_acidente, tipo_acidente, classificacao_acidente, fase_dia, condicao_metereologica, tipo_veiculo, estado_fisico, idade, sexo, 0, null);
+                Node noAVL = new Node(id, dia_semana, br_estrada, km, causa_acidente, tipo_acidente, classificacao_acidente, fase_dia, condicao_metereologica, tipo_veiculo, estado_fisico, idade, sexo, 0, null);
          
-                arvoreBST.insert(no);
-                arvoreAVL.insert(no);
-
-
-                Node busca = arvoreAVL.search(1);
+                arvoreBST.insert(noBST);
+                arvoreAVL.insertAVL(noAVL);
+                countInsertBST += arvoreBST.getComparisonCountBST();
+                countInsertAVL += arvoreAVL.getComparisonCountAVL();
                 
 
-
-                
 
             }
 
@@ -64,6 +73,152 @@ public class Main {
                     e.printStackTrace();
                 }
             }
+        }
+
+        
+        Scanner scanner = new Scanner(System.in);
+
+        
+        while (true) {
+            System.out.println("Selecione uma opção:");
+            System.out.println("1 - Qual é a distribuição de acidentes ao longo dos dias da semana, e há algum dia que apresenta uma frequência de ocorrências notavelmente maior em comparação aos demais?\n");
+            System.out.println("2 - Como o tipo de veículo está relacionado à gravidade dos acidentes, considerando as classificações existentes, como com vítimas fatais, feridos ou sem vítimas?\n");
+            System.out.println("3 - Quais trechos de rodovias, identificados por BR e KM, concentram o maior número de acidentes registrados?\n");
+            System.out.println("4 - De que forma a condição meteorológica, como chuva ou céu claro, interfere na quantidade e gravidade dos acidentes de trânsito?\n");
+            System.out.println("5 - Quais são os tipos de acidentes de trânsito mais comuns registrados?\n");
+            System.out.println("6 - Acidentes de trânsito são mais frequentes entre motoristas do sexo feminino ou masculino? Qual dos dois gêneros está mais envolvido?\n");
+            System.out.println("7 - remover algum dado baseado no seu id\n");
+            System.out.println("8 - procurar algum dado baseado no seu id\n");
+            System.out.println("9 - inserir algum dado\n");
+            System.out.println("10 - Comparação da primeira inserção BST x AVL\n");
+            System.out.println("11 - Sair\n");
+            System.out.println("\nSua escolha:");
+
+            int opcao = scanner.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    
+                    arvoreAVL.distribuicaoPorDiaDaSemana(); // Método implementado anteriormente
+                    break;
+                case 2:
+                    
+                    arvoreAVL.influenciaTipoVeiculo(); // Método implementado anteriormente
+                    break;
+                case 3:
+                    System.out.println("\nTrechos de rodovia com maior número de acidentes registrados:\n");
+                    arvoreAVL.trechosComMaisAcidentes(); // Método implementado anteriormente
+                    break;
+                case 4:
+                    System.out.println("\nInfluência da condição meteorológica nos acidentes:\n");
+                    arvoreAVL.influenciaCondicaoMeteorologica(); // Método implementado anteriormente
+                    break;
+                case 5:
+                    System.out.println("\nTipos de acidentes que mais ocorrem:\n");
+                    arvoreAVL.tiposDeAcidentesMaisOcorridos(); // Método implementado anteriormente
+                    break;
+                
+                case 6:
+                    System.out.println("\nAcidentes por sexo (feminino ou masculino):\n");
+                    arvoreAVL.acidentesSexo(); // Método implementado anteriormente
+                    break;
+                case 7:
+                    System.out.println("\nQual o id do dado deseja remover?");
+                    int removerId = scanner.nextInt();
+                    arvoreAVL.remove(removerId); // Método implementado anteriormente
+                    arvoreBST.remove(removerId);
+
+                    int countInsertBST4 = arvoreBST.getComparisonCountBST();
+                    int countInsertAVL4 = arvoreAVL.getComparisonCountBST();
+
+                    System.out.println("\nComparações BST: " + countInsertBST4);
+                    System.out.println("\nComparações AVL: " + countInsertAVL4);
+                    
+                    
+                    break;
+
+                case 8:
+                    System.out.println("\nQual o id do dado que deseja procurar?\n");
+                    int searchId = scanner.nextInt();
+                    Node noProcuradoAVL = arvoreAVL.search(searchId); // Método implementado anteriormente       
+                    Node noProcuradoBST = arvoreBST.search(searchId);
+                    if(noProcuradoAVL != null){
+                        System.out.println("\nDado encontrado:\n");
+                        System.out.println(noProcuradoAVL.getId() + "\t" + noProcuradoAVL.getDia_semana() + "\t" + noProcuradoAVL.getBr() + "\t" + noProcuradoAVL.getKm() + "\t" + noProcuradoAVL.getCausa_acidente() + "\t" + noProcuradoAVL.getTipo_acidente() + "\t" + noProcuradoAVL.getClassificacao_acidente() + "\t" + noProcuradoAVL.getFase_dia() + "\t" + noProcuradoAVL.getCondicao_metereologica() + "\t" + noProcuradoAVL.getTipo_veiculo() + "\t" + noProcuradoAVL.getEstado_fisico() + "\t" + noProcuradoAVL.getIdade() + "\t" + noProcuradoAVL.getSexo());
+                    }else{
+                        System.out.println("\nDado não encontrado.\n");
+                    }
+
+                    int countInsertBST3 = arvoreBST.getComparisonCountBST();
+                    int countInsertAVL3 = arvoreAVL.getComparisonCountBST();
+
+                    System.out.println("\nComparações BST: " + countInsertBST3);
+                    System.out.println("\nComparações AVL: " + countInsertAVL3);
+
+                    
+                    break;
+
+                case 9:
+                    System.out.println("\nDigite os seguintes dados para inserção de um dado:\n");
+                    System.out.println("ID:");
+                    int id2 = scanner.nextInt();
+                    System.out.println("Dia da semana:");
+                    String dia_semana2 = scanner.next();
+                    System.out.println("BR:");
+                    int br2 = scanner.nextInt();
+                    System.out.println("KM:");
+                    float km2 = scanner.nextFloat();
+                    System.out.println("Causa do acidente:");
+                    String causa_acidente2 = scanner.next();
+                    System.out.println("Tipo do acidente:");
+                    String tipo_acidente2 = scanner.next();
+                    System.out.println("Classificação do acidente:");
+                    String classificacao_acidente2 = scanner.next();
+                    System.out.println("Fase do dia:");
+                    String fase_dia2 = scanner.next();
+                    System.out.println("Condição meteorológica:");
+                    String condicao_metereologica2 = scanner.next();
+                    System.out.println("Tipo de veículo:");
+                    String tipo_veiculo2 = scanner.next();
+                    System.out.println("Estado físico:");
+                    String estado_fisico2 = scanner.next();
+                    System.out.println("Idade:");
+                    int idade2 = scanner.nextInt();
+                    System.out.println("Sexo:");
+                    String sexo2 = scanner.next();
+                    Node noBST2 = new Node(id2, dia_semana2, br2, km2, causa_acidente2, tipo_acidente2, classificacao_acidente2, fase_dia2, condicao_metereologica2, tipo_veiculo2, estado_fisico2, idade2, sexo2, 0, null);
+                    Node noAVL2 = new Node(id2, dia_semana2, br2, km2, causa_acidente2, tipo_acidente2, classificacao_acidente2, fase_dia2, condicao_metereologica2, tipo_veiculo2, estado_fisico2, idade2, sexo2, 0, null);
+                    arvoreBST.insert(noBST2);
+                    arvoreAVL.insertAVL(noAVL2);
+
+                    int countInsertBST2 = arvoreBST.getComparisonCountBST();
+                    int countInsertAVL2 = arvoreAVL.getComparisonCountAVL();
+
+                    System.out.println("\nDados inseridos com sucesso!\n");
+                    System.out.println("Comparações BST: " + countInsertBST2);
+                    System.out.println("Comparações AVL: " + countInsertAVL2);    
+                    
+
+
+
+                    break;
+
+                case 10:
+                    System.out.println("\nQuantidade de comparações na inserção da BST: " + countInsertBST);
+                    System.out.println("\nQuantidade de comparações na inserção da AVL: " + countInsertAVL);
+                    
+                           
+
+                    break;
+                case 11:
+                    System.out.println("\nSaindo...");
+                    scanner.close();
+                    return;
+                    
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+            System.out.println(); // Adiciona uma linha para organizar a saída
         }
   }
 }
